@@ -1,234 +1,134 @@
-import { useState } from 'react';
-import { Search, MapPin, Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ExternalLink, Plus, Trash2, Hotel, MapPin, Calendar } from 'lucide-react';
 
-interface Hotel {
+interface MyHotel {
   id: number;
   name: string;
-  location: string;
-  locationTag: string;
+  address: string;
+  city: string;
+  checkIn: string;
+  checkOut: string;
+  confirmation: string;
   price: string;
-  rating: number;
-  description: string;
-  amenities: string[];
-  image: string;
+  source: string;
+  notes: string;
 }
 
-const hotelsData: Hotel[] = [
-  {
-    id: 1,
-    name: 'Hotel Palacio del Retiro',
-    location: 'EL RETIRO',
-    locationTag: 'EL RETIRO',
-    price: '\u20ac185/night',
-    rating: 5,
-    description: 'Luxury boutique in a historic building. 10-min walk to Prado Museum.',
-    amenities: ['Free WiFi', 'Gym', 'Spa', 'Breakfast incl.'],
-    image: '/hotel1.jpg',
-  },
-  {
-    id: 2,
-    name: 'Room Mate Oscar',
-    location: 'GRAN V\u00cdA',
-    locationTag: 'GRAN V\u00cdA',
-    price: '\u20ac120/night',
-    rating: 4,
-    description: 'Design hotel at the heart of Gran V\u00eda. Modern, stylish and well-connected.',
-    amenities: ['Free WiFi', 'Rooftop Pool', 'Bar'],
-    image: '/hotel2.jpg',
-  },
-  {
-    id: 3,
-    name: 'Hospes Puerta de Alcal\u00e1',
-    location: 'SALAMANCA',
-    locationTag: 'SALAMANCA',
-    price: '\u20ac210/night',
-    rating: 5,
-    description: 'Upscale Salamanca district. Michelin-starred restaurant, ideal for business guests.',
-    amenities: ['Free WiFi', 'Spa', 'Michelin Restaurant', 'Concierge'],
-    image: '/hotel3.jpg',
-  },
-];
+const STORAGE_KEY = 'travelmind_hotels';
+
+function loadHotels(): MyHotel[] {
+  try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : []; }
+  catch { return []; }
+}
+function saveHotels(hotels: MyHotel[]) { localStorage.setItem(STORAGE_KEY, JSON.stringify(hotels)); }
+
+function buildBookingLink(city: string, checkIn: string, checkOut: string) {
+  const c = encodeURIComponent(city.trim());
+  return `https://www.booking.com/searchresults.html?ss=${c}&checkin=${checkIn}&checkout=${checkOut}&group_adults=2&no_rooms=1`;
+}
 
 export default function Hotels() {
-  const [searched, setSearched] = useState(true);
+  const [hotels, setHotels] = useState<MyHotel[]>(loadHotels);
+  const [showAdd, setShowAdd] = useState(false);
+  const [search, setSearch] = useState({ city: 'Madrid', checkIn: '2026-05-19', checkOut: '2026-05-24' });
+  const [form, setForm] = useState({ name: '', address: '', city: '', checkIn: '', checkOut: '', confirmation: '', price: '', source: '', notes: '' });
+
+  useEffect(() => { saveHotels(hotels); }, [hotels]);
+
+  const addHotel = () => {
+    if (!form.name || !form.city) return;
+    setHotels((prev) => [...prev, { id: Date.now(), ...form }]);
+    setForm({ name: '', address: '', city: '', checkIn: '', checkOut: '', confirmation: '', price: '', source: '', notes: '' });
+    setShowAdd(false);
+  };
+  const deleteHotel = (id: number) => setHotels((prev) => prev.filter((h) => h.id !== id));
 
   return (
     <div>
-      {/* Header */}
       <div className="mb-8">
-        <h1 className="font-display text-4xl mb-1" style={{ color: '#2D1F14' }}>Hotel Search</h1>
-        <p className="text-[11px] font-medium tracking-[0.1em] uppercase" style={{ color: '#9C8E84' }}>
-          CURATED STAYS
-        </p>
+        <h1 className="font-display text-4xl mb-1" style={{ color: '#2D1F14' }}>My Hotel Bookings</h1>
+        <p className="text-[11px] font-medium tracking-[0.1em] uppercase" style={{ color: '#9C8E84' }}>SEARCH &middot; BOOK &middot; MANAGE</p>
       </div>
 
-      {/* Search Form */}
-      <div
-        className="rounded-2xl p-6 mb-8"
-        style={{
-          backgroundColor: '#FAF8F5',
-          boxShadow: '0 8px 24px rgba(45,31,20,0.08)',
-        }}
-      >
-        <div className="grid grid-cols-5 gap-4 mb-4">
+      {/* Search */}
+      <div className="rounded-2xl p-6 mb-8" style={{ backgroundColor: '#FAF8F5', boxShadow: '0 8px 24px rgba(45,31,20,0.08)' }}>
+        <div className="grid grid-cols-3 gap-4 mb-4">
           <div>
-            <label className="block text-[10px] font-medium tracking-[0.1em] uppercase mb-1.5" style={{ color: '#9C8E84' }}>DESTINATION</label>
-            <input
-              type="text"
-              defaultValue="Madrid, Spain"
-              className="w-full px-4 py-3 rounded-lg text-sm outline-none"
-              style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }}
-            />
+            <label className="block text-[10px] font-medium tracking-[0.1em] uppercase mb-1.5" style={{ color: '#9C8E84' }}>CITY</label>
+            <input type="text" value={search.city} onChange={(e) => setSearch({ ...search, city: e.target.value })} className="w-full px-4 py-3 rounded-lg text-sm outline-none" style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }} />
           </div>
           <div>
             <label className="block text-[10px] font-medium tracking-[0.1em] uppercase mb-1.5" style={{ color: '#9C8E84' }}>CHECK-IN</label>
-            <input
-              type="text"
-              defaultValue="2026/05/19"
-              className="w-full px-4 py-3 rounded-lg text-sm outline-none"
-              style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }}
-            />
+            <input type="date" value={search.checkIn} onChange={(e) => setSearch({ ...search, checkIn: e.target.value })} className="w-full px-4 py-3 rounded-lg text-sm outline-none" style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }} />
           </div>
           <div>
             <label className="block text-[10px] font-medium tracking-[0.1em] uppercase mb-1.5" style={{ color: '#9C8E84' }}>CHECK-OUT</label>
-            <input
-              type="text"
-              defaultValue="2026/05/24"
-              className="w-full px-4 py-3 rounded-lg text-sm outline-none"
-              style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }}
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-medium tracking-[0.1em] uppercase mb-1.5" style={{ color: '#9C8E84' }}>ROOMS / GUESTS</label>
-            <input
-              type="text"
-              defaultValue="1 room \u00b7 2 guests"
-              className="w-full px-4 py-3 rounded-lg text-sm outline-none"
-              style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }}
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-medium tracking-[0.1em] uppercase mb-1.5" style={{ color: '#9C8E84' }}>BUDGET / NIGHT</label>
-            <input
-              type="text"
-              defaultValue="\u20ac80\u2013\u20ac200"
-              className="w-full px-4 py-3 rounded-lg text-sm outline-none"
-              style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }}
-            />
+            <input type="date" value={search.checkOut} onChange={(e) => setSearch({ ...search, checkOut: e.target.value })} className="w-full px-4 py-3 rounded-lg text-sm outline-none" style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }} />
           </div>
         </div>
-        <button
-          onClick={() => setSearched(true)}
-          className="flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-200"
-          style={{ backgroundColor: '#C67B5C', color: '#F5F0EB' }}
-          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#A65D3F'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#C67B5C'; }}
-        >
-          <Search size={16} />
-          Search Hotels
+        <div className="flex items-center gap-3">
+          <a href={buildBookingLink(search.city, search.checkIn, search.checkOut)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-200" style={{ backgroundColor: '#C67B5C', color: '#F5F0EB' }}>
+            <ExternalLink size={16} /> Search on Booking.com
+          </a>
+          <a href={`https://www.trip.com/hotels/list?city=${encodeURIComponent(search.city)}&checkin=${search.checkIn}&checkout=${search.checkOut}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-3 rounded-lg text-sm font-medium transition-all duration-200" style={{ backgroundColor: 'transparent', border: '1px solid #3D2E23', color: '#3D2E23' }}>
+            <ExternalLink size={14} /> Trip.com
+          </a>
+        </div>
+      </div>
+
+      {/* My Bookings */}
+      <div className="flex items-center justify-between mb-5">
+        <p className="text-[11px] font-medium tracking-[0.1em] uppercase" style={{ color: '#9C8E84' }}>{hotels.length} BOOKING{hotels.length !== 1 ? 'S' : ''} SAVED</p>
+        <button onClick={() => setShowAdd(!showAdd)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200" style={{ backgroundColor: showAdd ? '#A65D3F' : '#C67B5C', color: '#F5F0EB' }}>
+          <Plus size={16} /> {showAdd ? 'Cancel' : 'Add Booking'}
         </button>
       </div>
 
-      {/* Results */}
-      {searched && (
-        <div>
-          <p className="text-[11px] font-medium tracking-[0.1em] uppercase mb-4" style={{ color: '#9C8E84' }}>
-            {hotelsData.length} HOTELS FOUND
-          </p>
-          <div className="grid grid-cols-3 gap-5">
-            {hotelsData.map((hotel) => (
-              <div
-                key={hotel.id}
-                className="rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
-                style={{
-                  backgroundColor: '#FAF8F5',
-                  boxShadow: '0 4px 12px rgba(45,31,20,0.05)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '0 12px 40px rgba(45,31,20,0.1)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(45,31,20,0.05)';
-                }}
-              >
-                {/* Image */}
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img
-                    src={hotel.image}
-                    alt={hotel.name}
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="p-5">
-                  {/* Location */}
-                  <div className="flex items-center gap-1 mb-2">
-                    <MapPin size={12} style={{ color: '#C67B5C' }} />
-                    <span className="text-[10px] font-semibold tracking-[0.12em]" style={{ color: '#C67B5C' }}>
-                      {hotel.locationTag}
-                    </span>
-                  </div>
-
-                  {/* Name & Price */}
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-base font-semibold" style={{ color: '#2D1F14' }}>{hotel.name}</h3>
-                    <span className="text-base font-semibold whitespace-nowrap" style={{ color: '#C67B5C' }}>{hotel.price}</span>
-                  </div>
-
-                  {/* Rating */}
-                  <div className="flex items-center gap-0.5 mb-2">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        size={14}
-                        fill={i < hotel.rating ? '#D4A853' : 'none'}
-                        style={{ color: i < hotel.rating ? '#D4A853' : '#D9D4CF' }}
-                      />
-                    ))}
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-[13px] mb-3 line-clamp-2" style={{ color: '#6B5B4E' }}>
-                    {hotel.description}
-                  </p>
-
-                  {/* Amenities */}
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {hotel.amenities.map((amenity) => (
-                      <span
-                        key={amenity}
-                        className="px-2 py-1 rounded text-[11px] font-medium"
-                        style={{ backgroundColor: '#EBE7E0', color: '#6B5B4E' }}
-                      >
-                        {amenity}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2">
-                    <button
-                      className="flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-                      style={{ backgroundColor: '#C67B5C', color: '#F5F0EB' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#A65D3F'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#C67B5C'; }}
-                    >
-                      Book Now
-                    </button>
-                    <button
-                      className="flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-                      style={{ backgroundColor: 'transparent', border: '1px solid #3D2E23', color: '#3D2E23' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#EBE7E0'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-                    >
-                      Details
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+      {showAdd && (
+        <div className="rounded-2xl p-6 mb-6" style={{ backgroundColor: '#FAF8F5', border: '1px solid #E8E0D8' }}>
+          <h3 className="text-base font-semibold mb-4" style={{ color: '#2D1F14' }}>Add Hotel Booking</h3>
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <input placeholder="Hotel Name *" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="px-4 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }} />
+            <input placeholder="City *" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="px-4 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }} />
+            <input placeholder="Source (e.g. Booking.com)" value={form.source} onChange={(e) => setForm({ ...form, source: e.target.value })} className="px-4 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }} />
+            <input placeholder="Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} className="px-4 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }} />
+            <input type="date" value={form.checkIn} onChange={(e) => setForm({ ...form, checkIn: e.target.value })} className="px-4 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }} />
+            <input type="date" value={form.checkOut} onChange={(e) => setForm({ ...form, checkOut: e.target.value })} className="px-4 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }} />
+            <input placeholder="Confirmation #" value={form.confirmation} onChange={(e) => setForm({ ...form, confirmation: e.target.value })} className="px-4 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }} />
+            <input placeholder="Price (total)" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="px-4 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }} />
+            <input placeholder="Notes" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="px-4 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: '#F5F0EB', border: '1px solid #D9D4CF', color: '#2D1F14' }} />
           </div>
+          <button onClick={addHotel} className="px-6 py-2.5 rounded-lg text-sm font-medium" style={{ backgroundColor: '#C67B5C', color: '#F5F0EB' }}>Save Booking</button>
+        </div>
+      )}
+
+      {hotels.length === 0 ? (
+        <div className="rounded-2xl p-12 text-center" style={{ backgroundColor: '#FAF8F5', boxShadow: '0 4px 12px rgba(45,31,20,0.05)' }}>
+          <Hotel size={40} style={{ color: '#D9D4CF', margin: '0 auto 12px' }} />
+          <p className="text-sm" style={{ color: '#9C8E84' }}>No hotel bookings yet. Click &quot;Add Booking&quot; to add your hotels.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-5">
+          {hotels.map((hotel) => (
+            <div key={hotel.id} className="rounded-2xl p-5 transition-all duration-300" style={{ backgroundColor: '#FAF8F5', boxShadow: '0 4px 12px rgba(45,31,20,0.05)' }}>
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h3 className="text-base font-semibold" style={{ color: '#2D1F14' }}>{hotel.name}</h3>
+                  {hotel.source && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ backgroundColor: '#EBE7E0', color: '#6B5B4E' }}>Booked on {hotel.source}</span>}
+                </div>
+                <button onClick={() => deleteHotel(hotel.id)} className="p-1.5 rounded transition-colors duration-200" style={{ color: '#9C8E84' }} onMouseEnter={(e) => { e.currentTarget.style.color = '#B85C50'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#9C8E84'; }}>
+                  <Trash2 size={14} />
+                </button>
+              </div>
+              {hotel.address && <p className="flex items-center gap-1 text-[12px] mb-2" style={{ color: '#6B5B4E' }}><MapPin size={12} /> {hotel.address}, {hotel.city}</p>}
+              <div className="flex flex-wrap gap-3 text-[12px] mb-2" style={{ color: '#6B5B4E' }}>
+                <span className="flex items-center gap-1"><Calendar size={12} /> {hotel.checkIn || '—'} → {hotel.checkOut || '—'}</span>
+                {hotel.confirmation && <span style={{ color: '#C67B5C' }}>Conf: {hotel.confirmation}</span>}
+              </div>
+              {hotel.price && <p className="text-base font-semibold" style={{ color: '#C67B5C' }}>{hotel.price}</p>}
+              {hotel.notes && <p className="text-[12px] mt-2" style={{ color: '#9C8E84' }}>{hotel.notes}</p>}
+            </div>
+          ))}
         </div>
       )}
     </div>
