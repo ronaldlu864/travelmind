@@ -10,7 +10,7 @@
 // Get your key: https://platform.moonshot.cn/
 
 export const KIMI_CONFIG = {
-  API_KEY: import.meta.env.VITE_KIMI_API_KEY || '',
+  API_KEY: 'sk-RSRtfU0pOH5rW6nYk0bJe3D2hpM8LGz97nGv0AMuCbiZXPMM',
   BASE_URL: 'https://api.moonshot.cn/v1',
   MODEL: 'moonshot-v1-8k',
   SYSTEM_PROMPT: `You are TravelMind, a warm and knowledgeable family travel assistant. You help families plan trips, find flights & hotels, build packing lists, explain visa requirements, suggest activities, and answer any travel-related questions.
