@@ -80,3 +80,92 @@
     background: var(--text-muted);
   }
 }
+
+/* ================================ */
+/* Sidebar Responsive Styles        */
+/* ================================ */
+
+.main-content {
+  margin-left: 260px;
+}
+
+/* Mobile icon-only sidebar (screens below 768px) */
+@media (max-width: 767px) {
+  .sidebar-responsive {
+    width: 56px !important;
+  }
+
+  /* Hide full logo, show icon-only */
+  .logo-full {
+    display: none !important;
+  }
+  .logo-icon-only {
+    display: flex !important;
+  }
+
+  /* Center nav items, remove padding */
+  .nav-mobile {
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+  }
+
+  /* Center each nav item */
+  .nav-item {
+    justify-content: center !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Hide text labels */
+  .nav-label {
+    display: none !important;
+  }
+
+  /* Hide group titles */
+  .group-title {
+    display: none !important;
+  }
+
+  /* Hide badges */
+  .nav-badge {
+    display: none !important;
+  }
+
+  /* Adjust main content margin */
+  .main-content {
+    margin-left: 56px !important;
+  }
+
+  /* Reduce header padding */
+  .topbar-responsive {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Reduce content padding */
+  .content-responsive {
+    padding: 16px !important;
+  }
+}
+
+/* Desktop: show everything (screens 768px and up) */
+@media (min-width: 768px) {
+  .logo-full {
+    display: block !important;
+  }
+  .logo-icon-only {
+    display: none !important;
+  }
+
+  .nav-label {
+    display: block !important;
+  }
+
+  .group-title {
+    display: block !important;
+  }
+
+  .nav-badge {
+    display: inline-flex !important;
+  }
+}

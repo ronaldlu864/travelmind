@@ -66,9 +66,12 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-[260px] flex flex-col" style={{ backgroundColor: '#2D1F14', zIndex: 50 }}>
-      {/* Logo */}
-      <div className="px-6 pt-6 pb-8">
+    <aside
+      className="fixed left-0 top-0 h-screen flex flex-col sidebar-responsive"
+      style={{ backgroundColor: '#2D1F14', zIndex: 50, width: '260px' }}
+    >
+      {/* Logo - full on desktop, icon only on mobile */}
+      <div className="px-6 pt-6 pb-8 logo-full">
         <div className="flex items-center gap-2">
           <Globe size={22} style={{ color: '#C67B5C' }} />
           <div>
@@ -81,13 +84,18 @@ export default function Sidebar() {
           </div>
         </div>
       </div>
+      {/* Mobile: icon-only logo */}
+      <div className="logo-icon-only pt-6 pb-4 flex justify-center">
+        <Globe size={22} style={{ color: '#C67B5C' }} />
+      </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto scrollbar-thin px-3 pb-6">
+      <nav className="flex-1 overflow-y-auto scrollbar-thin px-3 pb-6 nav-mobile">
         {navGroups.map((group) => (
           <div key={group.title} className="mb-6">
+            {/* Group title - hidden on mobile */}
             <p
-              className="px-3 mb-2 text-[10px] font-medium tracking-[0.12em] uppercase"
+              className="px-3 mb-2 text-[10px] font-medium tracking-[0.12em] uppercase group-title"
               style={{ color: 'rgba(156,142,132,0.7)' }}
             >
               {group.title}
@@ -98,7 +106,7 @@ export default function Sidebar() {
                 <button
                   key={item.path}
                   onClick={() => navigate(item.path)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 relative"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 relative nav-item"
                   style={{
                     color: active ? '#F5F0EB' : '#9C8E84',
                     backgroundColor: active ? 'rgba(198,123,92,0.15)' : 'transparent',
@@ -116,12 +124,15 @@ export default function Sidebar() {
                       e.currentTarget.style.backgroundColor = 'transparent';
                     }
                   }}
+                  title={item.label}
                 >
                   <span className="flex-shrink-0">{item.icon}</span>
-                  <span className="flex-1 text-left">{item.label}</span>
+                  {/* Label - hidden on mobile */}
+                  <span className="flex-1 text-left nav-label">{item.label}</span>
+                  {/* Badge - hidden on mobile */}
                   {item.badge && (
                     <span
-                      className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
+                      className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full nav-badge"
                       style={{ backgroundColor: '#C67B5C', color: '#F5F0EB' }}
                     >
                       {item.badge}

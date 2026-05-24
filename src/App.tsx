@@ -14,11 +14,11 @@ function App() {
   return (
     <div className="flex min-h-screen" style={{ backgroundColor: '#F5F0EB' }}>
       <Sidebar />
-      <main className="flex-1 ml-[260px] min-h-screen">
+      <main className="flex-1 min-h-screen main-content">
         {/* Topbar */}
-        <header className="h-14 flex items-center justify-end px-8 sticky top-0 z-40" style={{ backgroundColor: 'rgba(245,240,235,0.92)', backdropFilter: 'blur(12px)' }}>
+        <header className="topbar-responsive h-14 flex items-center justify-end px-8 sticky top-0 z-40" style={{ backgroundColor: 'rgba(245,240,235,0.92)', backdropFilter: 'blur(12px)' }}>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5">
+            <div className="hidden md:flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#6E8B65' }}></span>
               <span className="text-[13px] font-medium" style={{ color: '#6B5B4E' }}>Synced</span>
             </div>
@@ -26,13 +26,13 @@ function App() {
               <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold" style={{ backgroundColor: '#C67B5C', color: '#F5F0EB' }}>
                 M
               </div>
-              <span className="text-[13px] font-medium" style={{ color: '#F5F0EB' }}>Melvin Lu</span>
+              <span className="text-[13px] font-medium hidden md:inline" style={{ color: '#F5F0EB' }}>Melvin Lu</span>
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <div className="p-8">
+        <div className="p-8 content-responsive">
           <Routes>
             <Route path="/" element={<AIAdvisor />} />
             <Route path="/flights" element={<Flights />} />
